@@ -1,0 +1,35 @@
+import uuid
+import boto3
+from fastapi import FastAPI, File, UploadFile, HTTPException
+
+from app.config import settings
+app = FastAPI(title="Doc Intel Pipeline")
+
+# Initialize S3 client once at startup
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=settings.aws_access_key_id,
+    aws_secret_access_key=settings.aws_secret_access_key,
+    region_name='us-east-1'
+)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
+@app.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
+
+    # Generate a unique key so uploads never collide
+    key = f"uploads/{file.filename}"
+
+    try:
+        s3.upload_fileobj(file.file, settings.s3_bucket, key)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"S3 upload failed: {e}")
+
+    return {"message": "Upload successful", "s3_key": key}

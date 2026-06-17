@@ -1,0 +1,4 @@
+pypdf
+sentence-transformers
+qdrant-client
+boto3

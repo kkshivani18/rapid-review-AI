@@ -56,7 +56,7 @@ def handler(event, context):
 
         if not full_text.strip():
             print(f"Warning: no extractable text in {key}")
-            return
+            continue
 
         # Chunk and embed
         chunks = chunk_text(full_text)

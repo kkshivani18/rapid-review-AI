@@ -62,3 +62,6 @@ ROADMAP_old.md
 ROADMAP.md
 s3-bucket-user_credentials.xlsx
 indian_contract.pdf
+policy.json
+trust-policy.json
+ecr-policy.json

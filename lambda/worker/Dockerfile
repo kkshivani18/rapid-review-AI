@@ -14,8 +14,13 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     find /var/lang/lib/python3.12/site-packages -name "*.so" -exec strip --strip-debug {} + 2>/dev/null || true && \
     rm -rf /root/.cache/pip /tmp/* /var/tmp/*
 
-# Do NOT pre-download the model here. Model will be downloaded to /tmp at runtime.
-# This keeps the image small enough for reliable Lambda initialization.
+# Pre-download the embedding model at build time.
+# This prevents runtime "Can't load model" / OSError crashes when the download
+# is interrupted by Lambda timeouts or cold-start limits.
+# Size: ~100 MB
+RUN mkdir -p /var/task/models && \
+    python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', cache_folder='/var/task/models')" && \
+    chmod -R 755 /var/task/models
 
 COPY handler.py ${LAMBDA_TASK_ROOT}
 

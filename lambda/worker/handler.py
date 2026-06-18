@@ -13,7 +13,17 @@ QDRANT_HOST = os.environ['QDRANT_HOST']
 COLLECTION_NAME = "documents"
 EMBEDDING_DIM = 384  # all-MiniLM-L6-v2 outputs 384-dimensional vectors
 
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+# Load model from the pre-bundled cache inside the image (read-only, no runtime download)
+_model = None
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(
+            'sentence-transformers/all-MiniLM-L6-v2',
+            cache_folder='/var/task/models'
+        )
+    return _model
+
 qdrant = QdrantClient(host=QDRANT_HOST, port=6333)
 
 
@@ -38,6 +48,7 @@ def chunk_text(text, chunk_size=500, overlap=50):
 
 def handler(event, context):
     ensure_collection()
+    model = get_model()
 
     for record in event['Records']:
         body = json.loads(record['body'])

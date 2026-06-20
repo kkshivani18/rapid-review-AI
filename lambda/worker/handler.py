@@ -1,12 +1,12 @@
 import json
 import boto3
 import os
+import io
+import uuid
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
-import io
-import uuid
 
 s3 = boto3.client('s3')
 QDRANT_HOST = os.environ['QDRANT_HOST']
@@ -61,16 +61,19 @@ def handler(event, context):
         obj = s3.get_object(Bucket=bucket, Key=key)
         pdf_bytes = obj['Body'].read()
 
-        # Extract text
+        # Extract text using pypdf (handles standard text-based PDFs)
         reader = PdfReader(io.BytesIO(pdf_bytes))
         full_text = ' '.join(page.extract_text() or '' for page in reader.pages)
 
         if not full_text.strip():
-            print(f"Warning: no extractable text in {key}")
+            print(f"Warning: no extractable text in {key}. Scanned/image-based PDFs require OCR (AWS Textract) — out of scope for v1.")
             continue
+
+        print(f"Extracted text length: {len(full_text)} characters")
 
         # Chunk and embed
         chunks = chunk_text(full_text)
+        print(f"Generated {len(chunks)} chunks")
         embeddings = model.encode(chunks).tolist()
 
         # Store in Qdrant
@@ -85,3 +88,8 @@ def handler(event, context):
 
         qdrant.upsert(collection_name=COLLECTION_NAME, points=points)
         print(f"Stored {len(points)} vectors for {key}")
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'message': f'Processed {len(event["Records"])} record(s)'})
+    }

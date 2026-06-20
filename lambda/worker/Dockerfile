@@ -1,7 +1,8 @@
 FROM public.ecr.aws/lambda/python:3.12
 
-# Install CPU-only torch to avoid the 5GB CUDA bloat
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+# Install CPU-only torch to avoid the 5GB CUDA bloat.
+# --timeout 600 prevents hash-mismatch errors on slow networks (default 15s is too short for 192MB+ wheels).
+RUN pip install --no-cache-dir --timeout 600 torch --index-url https://download.pytorch.org/whl/cpu
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && \
@@ -14,14 +15,14 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     find /var/lang/lib/python3.12/site-packages -name "*.so" -exec strip --strip-debug {} + 2>/dev/null || true && \
     rm -rf /root/.cache/pip /tmp/* /var/tmp/*
 
-# Pre-download the embedding model at build time.
-# This prevents runtime "Can't load model" / OSError crashes when the download
-# is interrupted by Lambda timeouts or cold-start limits.
+# Pre-download the embedding model at build time so the Lambda cold start
+# doesn't spend 30-60 seconds downloading it from HuggingFace.
 # Size: ~100 MB
 RUN mkdir -p /var/task/models && \
     python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', cache_folder='/var/task/models')" && \
     chmod -R 755 /var/task/models
 
+# Copy application code
 COPY handler.py ${LAMBDA_TASK_ROOT}
 
 CMD ["handler.handler"]

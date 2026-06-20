@@ -65,3 +65,7 @@ indian_contract.pdf
 policy.json
 trust-policy.json
 ecr-policy.json
+legal_doc.pdf
+logs2.txt
+cloudwatch_permission.json
+extras/*

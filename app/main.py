@@ -1,9 +1,11 @@
 import uuid
 import boto3
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from pydantic import BaseModel
+from app.retrieval import answer_question
 
 from app.config import settings
-app = FastAPI(title="Doc Intel Pipeline")
+app = FastAPI(title="AI Docs Intelligence Pipeline")
 
 # Initialize S3 client once at startup
 s3 = boto3.client(
@@ -13,6 +15,13 @@ s3 = boto3.client(
     region_name='us-east-1'
 )
 
+class QueryRequest(BaseModel):
+    question: str
+
+@app.post("/query")
+async def query(req: QueryRequest):
+    answer = answer_question(req.question)
+    return {"answer": answer}
 
 @app.get("/health")
 async def health():

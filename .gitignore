@@ -69,3 +69,5 @@ legal_doc.pdf
 logs2.txt
 cloudwatch_permission.json
 extras/*
+ITERATIONS.md
+scripts/*

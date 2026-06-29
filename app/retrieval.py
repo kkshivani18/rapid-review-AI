@@ -2,13 +2,12 @@ import os
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from groq import Groq
+from app.config import settings, GROQ_API_KEY
 
-QDRANT_HOST = os.environ['QDRANT_HOST']
-GROQ_API_KEY = os.environ['GROQ_API_KEY']
 COLLECTION_NAME = "documents"
 
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-qdrant = QdrantClient(host=QDRANT_HOST, port=6333)
+qdrant = QdrantClient(host=settings.qdrant_host, port=6333)
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 

@@ -3,16 +3,14 @@ import boto3
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
 from app.retrieval import answer_question
-
 from app.config import settings
+
 app = FastAPI(title="AI Docs Intelligence Pipeline")
 
 # Initialize S3 client once at startup
 s3 = boto3.client(
     "s3",
-    aws_access_key_id=settings.aws_access_key_id,
-    aws_secret_access_key=settings.aws_secret_access_key,
-    region_name='us-east-1'
+    region_name=settings.aws_region
 )
 
 class QueryRequest(BaseModel):

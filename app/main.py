@@ -23,7 +23,7 @@ async def query(req: QueryRequest):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "version": "1.1.0"}
+    return {"status": "ok", "version": "1.0"}
 
 
 @app.post("/upload")

@@ -10,7 +10,7 @@ app = FastAPI(title="AI Docs Intelligence Pipeline")
 
 # Initialize clients
 s3 = boto3.client("s3", region_name=settings.aws_region)
-cloudwatch = boto3.client('cloudwatch', region_name=os.environ['AWS_REGION'])
+cloudwatch = boto3.client('cloudwatch', region_name=settings.aws_region)
 
 class QueryRequest(BaseModel):
     question: str

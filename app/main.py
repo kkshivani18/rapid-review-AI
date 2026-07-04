@@ -1,5 +1,6 @@
 import uuid
 import boto3
+import time
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
 from app.retrieval import answer_question
@@ -7,19 +8,31 @@ from app.config import settings
 
 app = FastAPI(title="AI Docs Intelligence Pipeline")
 
-# Initialize S3 client once at startup
-s3 = boto3.client(
-    "s3",
-    region_name=settings.aws_region
-)
+# Initialize clients
+s3 = boto3.client("s3", region_name=settings.aws_region)
+cloudwatch = boto3.client('cloudwatch', region_name=os.environ['AWS_REGION'])
 
 class QueryRequest(BaseModel):
     question: str
 
 @app.post("/query")
 async def query(req: QueryRequest):
+    start = time.time()
     answer = answer_question(req.question)
-    return {"answer": answer}
+
+    # calc latency
+    latency_ms = (time.time() - start) * 1000
+
+    cloudwatch.put_metric_data(
+        Namespace='RapidReview/API',
+        MetricData=[{
+            'MetricName': 'QueryLatency',
+            'Value': latency_ms,
+            'Unit': 'Milliseconds'
+        }]
+    )
+
+    return {"answer": answer, "latency_ms": round(latency_ms)}
 
 @app.get("/health")
 async def health():
@@ -31,7 +44,7 @@ async def upload(file: UploadFile = File(...)):
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    # Generate a unique key so uploads never collide
+    # generate a unique key so uploads never collide
     key = f"uploads/{file.filename}"
 
     try:

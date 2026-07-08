@@ -220,7 +220,7 @@ Groq provides a generous free tier (14,400 requests/day on Llama 3 8B). OpenAI c
 
 ---
 
-## What I Would Add Next
+<!-- ## What I Would Add Next
 
 - Auto-scaling on ECS based on ALB request count
 - CloudFront CDN for the ALB
@@ -231,7 +231,6 @@ Groq provides a generous free tier (14,400 requests/day on Llama 3 8B). OpenAI c
 
 ---
 
-<!-- 
 ## Resume Bullet
 
 > Built an AI document review pipeline for contract analysis on AWS — event-driven ingestion via S3, Lambda, and SQS with a DLQ; vector search on Qdrant in a VPC-isolated private subnet; query API on ECS Fargate behind an ALB; automated CI/CD via CodePipeline with zero-downtime rolling deploys and CloudWatch rollback on health failures. Infrastructure defined in Terraform.

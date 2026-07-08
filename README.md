@@ -1,4 +1,4 @@
-# AI Document Intelligence Pipeline
+# Rapid Review AI: Event-Driven AI Document Pipeline for Legal Tech
 
 > Automated contract analysis and question-answering using RAG (Retrieval-Augmented Generation) on AWS.
 
@@ -84,11 +84,11 @@ GitHub push
 | Days 1–2 | FastAPI skeleton + S3 upload | ✅ Complete |
 | Day 3 | S3 Event → Lambda Trigger → SQS | ✅ Complete |
 | Day 4 | Processing worker (extract, chunk, embed, store) | ✅ Complete |
-| Day 5 | VPC, subnets, security groups | 🔜 Planned |
-| Day 6 | Query endpoint on ECS Fargate + ALB | 🔜 Planned |
-| Day 7 | IAM roles + Secrets Manager | 🔜 Planned |
-| Days 8–9 | CI/CD: CodePipeline + CodeBuild | 🔜 Planned |
-| Day 10 | CloudWatch logs, alarms, dashboard | 🔜 Planned |
+| Day 5 | VPC, subnets, security groups | ✅ Complete |
+| Day 6 | Query endpoint on ECS Fargate + ALB | ✅ Complete |
+| Day 7 | IAM roles + Secrets Manager | ✅ Complete |
+| Days 8–9 | CI/CD: CodePipeline + CodeBuild | ✅ Complete |
+| Day 10 | CloudWatch logs, alarms, dashboard | ✅ Complete |
 | Days 11–12 | Terraform entire infrastructure | 🔜 Planned |
 | Days 13–14 | README, architecture diagram, demo | 🔜 Planned |
 
@@ -110,7 +110,7 @@ curl -X POST http://localhost:8000/upload \
 }
 ```
 
-### Query a Document (Coming Day 6)
+### Query a Document
 ```bash
 curl -X POST http://ALB-DNS/query \
   -H "Content-Type: application/json" \
@@ -252,10 +252,10 @@ rapidReview AI/
 │       ├── handler.py       # SQS consumer → process doc
 │       ├── Dockerfile         # Lambda container image
 │       └── requirements.txt # Worker dependencies
-├── Dockerfile               # FastAPI container image (Day 6+)
+├── Dockerfile               # FastAPI container image
 ├── requirements.txt         # Root dependencies
 ├── infra/                   # Terraform files (Days 11–12)
-├── buildspec.yml            # CodeBuild instructions (Days 8–9)
+├── buildspec.yml            # CodeBuild instructions
 ├── .env                     # Environment variables (not committed)
 ├── .gitignore
 └── README.md                # This file

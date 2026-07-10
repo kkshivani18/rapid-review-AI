@@ -64,16 +64,16 @@ GitHub push
 | Service | Purpose | Why It Was Chosen |
 |---------|---------|-------------------|
 | **S3** | Object storage for uploaded PDFs | Durable (99.999999999%), infinitely scalable, fractions of a cent per GB |
-| **Lambda** | Event-driven trigger & async worker | Zero cost at rest; scale-to-zero compute; container images bypass 250MB limit |
-| **SQS** | Decouple upload from processing | Absorbs load spikes; free retry logic + DLQ for poison-pill messages |
-| **ECS Fargate** | Stateless query API | No EC2 management; pay per CPU/memory second |
-| **EC2** | Qdrant vector database | Stateful workload requiring persistent storage; ~$15/month vs $700+ for managed alternatives |
-| **ALB** | Load balancer for query API | Stable DNS endpoint; health checks; zero-downtime rolling deploys |
-| **ECR** | Container image registry | AWS-native; integrates with CodePipeline |
+| **Lambda** | Event-driven trigger & async worker | Zero cost at rest, scale-to-zero compute, container images bypass 250MB limit |
+| **SQS** | Decouple upload from processing | Absorbs load spikes, free retry logic + DLQ for poison-pill messages |
+| **ECS Fargate** | Stateless query API | No EC2 management, pay per CPU/memory second |
+| **EC2** | Qdrant vector database | Stateful workload requiring persistent storage, ~$15/month vs $700+ for managed alternatives |
+| **ALB** | Load balancer for query API | Stable DNS endpoint, health checks, zero-downtime rolling deploys |
+| **ECR** | Container image registry | AWS-native, integrates with CodePipeline |
 | **CodePipeline + CodeBuild** | CI/CD | Git push → build → deploy with zero manual steps |
-| **CloudWatch** | Logs, metrics, alarms | Production observability; custom query latency metrics |
-| **Secrets Manager** | API key storage | No hardcoded credentials; least-privilege access |
-| **VPC + IAM** | Networking & security | Private subnets for data plane; security group chaining; least-privilege roles |
+| **CloudWatch** | Logs, metrics, alarms | Production observability, custom query latency metrics |
+| **Secrets Manager** | API key storage | No hardcoded credentials, least-privilege access |
+| **VPC + IAM** | Networking & security | Private subnets for data plane, security group chaining, least-privilege roles |
 
 ---
 
@@ -89,8 +89,7 @@ GitHub push
 | Day 7 | IAM roles + Secrets Manager | ✅ Complete |
 | Days 8–9 | CI/CD: CodePipeline + CodeBuild | ✅ Complete |
 | Day 10 | CloudWatch logs, alarms, dashboard | ✅ Complete |
-| Days 11–12 | Terraform entire infrastructure | 🔜 Planned |
-| Days 13–14 | README, architecture diagram, demo | 🔜 Planned |
+| Days 11–12 | Terraform entire infrastructure | ✅ Complete |
 
 ---
 
@@ -233,7 +232,7 @@ Groq provides a generous free tier (14,400 requests/day on Llama 3 8B). OpenAI c
 
 ## Resume Bullet
 
-> Built an AI document review pipeline for contract analysis on AWS — event-driven ingestion via S3, Lambda, and SQS with a DLQ; vector search on Qdrant in a VPC-isolated private subnet; query API on ECS Fargate behind an ALB; automated CI/CD via CodePipeline with zero-downtime rolling deploys and CloudWatch rollback on health failures. Infrastructure defined in Terraform.
+> Built an AI document review pipeline for contract analysis on AWS — event-driven ingestion via S3, Lambda, and SQS with a DLQ, vector search on Qdrant in a VPC-isolated private subnet, query API on ECS Fargate behind an ALB, automated CI/CD via CodePipeline with zero-downtime rolling deploys and CloudWatch rollback on health failures. Infrastructure defined in Terraform.
 
 --- -->
 

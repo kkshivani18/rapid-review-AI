@@ -12,35 +12,7 @@ This project automates that workflow — PDFs are uploaded, processed asynchrono
 
 ## Architecture
 
-```
-User (Postman/curl)
-      │
-      ▼
-  POST /upload
-      │
-      ▼
-[S3 Bucket] ──── S3 Event ───► [Lambda: Trigger] ───► [SQS Queue]
-                                                          │
-                                                          ▼
-                                              [Lambda Worker: Container Image]
-                                                - pypdf text extraction
-                                                - chunking (500 tokens)
-                                                - sentence-transformer embeddings
-                                                - store → Qdrant (EC2, private subnet)
-
-User (Postman/curl)
-      │
-      ▼
-  POST /query ──► [ALB] ──► [ECS Fargate: FastAPI]
-                              - retrieve from Qdrant
-                              - LLM answer generation (Groq)
-                              - return response
-
-GitHub push
-      │
-      ▼
-[CodePipeline] ──► [CodeBuild] ──► [ECR] ──► [ECS Rolling Deploy]
-```
+![rapid-review AI Architecture](<./extras/images/architecture main.png>)
 
 ---
 

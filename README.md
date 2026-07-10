@@ -12,7 +12,7 @@ This project automates that workflow — PDFs are uploaded, processed asynchrono
 
 ## Architecture
 
-![rapid-review AI Architecture](<./extras/images/architecture main.png>)
+![rapid-review AI Architecture](<./images/architecture main.png>)
 
 ---
 

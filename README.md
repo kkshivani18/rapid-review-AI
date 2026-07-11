@@ -14,6 +14,40 @@ This project automates that workflow — PDFs are uploaded, processed asynchrono
 
 ![rapid-review AI Architecture](<./images/architecture main.png>)
 
+### Architecture Summary
+
+The system is split into three independent pipelines — **Ingestion**, **Query**, and **CI/CD** — connected by a shared VPC and Qdrant vector database.
+
+**Ingestion Pipeline (Event-Driven, Asynchronous)**
+1. A user uploads a PDF via the FastAPI `/upload` endpoint.
+2. The PDF is stored in **S3**, which fires an object-created event.
+3. An **S3 Event Notification** triggers a lightweight **Lambda (Trigger)** function.
+4. The Trigger function pushes a message containing the S3 bucket and key into an **SQS Queue** (with a Dead Letter Queue for poison-pill messages).
+5. A **Lambda Worker** (running as a container image for large ML dependencies) polls the SQS queue, receives the message, and:
+   - Downloads the PDF from S3
+   - Extracts text using `pypdf`
+   - Chunks the text into 500-token segments with 50-token overlap
+   - Generates 384-dimensional embeddings using `sentence-transformers/all-MiniLM-L6-v2`
+   - Stores vectors and metadata in **Qdrant** (running on an EC2 instance in a private subnet)
+
+**Query Pipeline (Synchronous, Always-On)**
+1. A user sends a natural-language question to the FastAPI `/query` endpoint via an **Application Load Balancer (ALB)**.
+2. The request is routed to **ECS Fargate** tasks running the FastAPI container.
+3. The API embeds the question using the same `all-MiniLM-L6-v2` model.
+4. It queries **Qdrant** for the top-k most relevant text chunks via vector similarity search.
+5. The retrieved chunks are passed to **Groq (Llama 3 8B)** as context, and a synthesized answer is returned to the user.
+
+**CI/CD & Deployment Pipeline**
+1. A `git push` to the repository triggers **AWS CodePipeline**.
+2. **CodeBuild** compiles the application, builds a Docker image, and pushes it to **ECR**.
+3. CodePipeline then triggers a rolling deployment to **ECS Fargate**, ensuring zero-downtime updates with automatic rollback on health check failures.
+
+**Security & Networking**
+- **VPC** isolates the data plane: Qdrant lives in a private subnet with no direct internet access, reachable only via security group chaining from ECS and Lambda.
+- **NAT Gateway** allows outbound internet access for ECS tasks and Lambda workers (to reach ECR, Groq, and model downloads) without exposing private resources to inbound traffic.
+- **IAM roles** enforce least-privilege access at every layer — no hardcoded credentials.
+- **AWS Secrets Manager** stores API keys (Groq, etc.) and is injected into ECS tasks at runtime.
+
 ---
 
 ## Tech Stack
@@ -46,22 +80,6 @@ This project automates that workflow — PDFs are uploaded, processed asynchrono
 | **CloudWatch** | Logs, metrics, alarms | Production observability, custom query latency metrics |
 | **Secrets Manager** | API key storage | No hardcoded credentials, least-privilege access |
 | **VPC + IAM** | Networking & security | Private subnets for data plane, security group chaining, least-privilege roles |
-
----
-
-## Project Status
-
-| Day | Focus | Status |
-|-----|-------|--------|
-| Days 1–2 | FastAPI skeleton + S3 upload | ✅ Complete |
-| Day 3 | S3 Event → Lambda Trigger → SQS | ✅ Complete |
-| Day 4 | Processing worker (extract, chunk, embed, store) | ✅ Complete |
-| Day 5 | VPC, subnets, security groups | ✅ Complete |
-| Day 6 | Query endpoint on ECS Fargate + ALB | ✅ Complete |
-| Day 7 | IAM roles + Secrets Manager | ✅ Complete |
-| Days 8–9 | CI/CD: CodePipeline + CodeBuild | ✅ Complete |
-| Day 10 | CloudWatch logs, alarms, dashboard | ✅ Complete |
-| Days 11–12 | Terraform entire infrastructure | ✅ Complete |
 
 ---
 

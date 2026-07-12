@@ -198,6 +198,8 @@ docker build -t rapid-review-worker .
 
 [Checkout the article on Medium](https://medium.com/@kkrishnashivani18/automating-contract-review-event-driven-ai-document-pipeline-for-legal-tech-144bc1063eda)
 
+---
+
 ## Key Design Decisions
 
 ### Why Qdrant on EC2 instead of OpenSearch Serverless?

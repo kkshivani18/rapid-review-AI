@@ -157,7 +157,7 @@ Create a `.env` file in the project root:
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_REGION=us-east-1
-S3_BUCKET=your-doc-intel-bucket
+S3_BUCKET=your-rapid-review-bucket
 QDRANT_HOST=your-ec2-public-ip
 GROQ_API_KEY=your_groq_key
 ```
@@ -172,7 +172,7 @@ uvicorn app.main:app --reload
 
 ```bash
 cd lambda/worker
-docker build -t doc-intel-worker .
+docker build -t rapid-review-worker .
 ```
 
 ---
@@ -192,6 +192,11 @@ docker build -t doc-intel-worker .
 | **Total** | | **~$70/month** |
 
 ---
+
+
+## Article on Medium
+
+[Checkout the article on Medium](https://medium.com/@kkrishnashivani18/automating-contract-review-event-driven-ai-document-pipeline-for-legal-tech-144bc1063eda)
 
 ## Key Design Decisions
 

@@ -38,3 +38,23 @@ module "ecs_api" {
   sg_alb_id          = module.networking.sg_alb_id
   execution_role_arn = module.iam.ecs_execution_role_arn
 }
+
+module "cicd" {
+  source = "../../modules/cicd"
+  
+  project_name         = var.project_name
+  pipeline_name        = "rapid-review-pipeline"
+  build_project_name   = "rapid-review-build"
+  artifact_bucket_name = "codepipeline-us-east-1-fd05aaa609e5-42a1-8839-7ec9ee153040"
+}
+
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
+  
+  project_name     = var.project_name
+  ecs_cluster_name = "rapid-review-cluster"
+  ecs_service_name = "rapid-review-api-service"
+  sqs_queue_name   = "doc-processing-queue"
+  dlq_name         = "doc-processing-dlq"
+  alert_email      = "kkrishnashivani18@gmail.com" 
+}
